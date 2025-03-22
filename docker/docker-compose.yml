@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  # MongoDB服务
+  mongodb:
+    image: mongo:latest
+    container_name: mcp-mongodb
+    restart: always
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - mcp-network
+
+  # MCP服务器
+  mcp-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: mcp-server
+    restart: always
+    depends_on:
+      - mongodb
+    volumes:
+      - mcp_storage:/app/storage
+      - mcp_vector_db:/app/vector_db
+    ports:
+      - "8000:8000"
+    environment:
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=8000
+      - MCP_DEBUG=false
+      - MCP_FILE_STORAGE_PATH=/app/storage
+      - MCP_VECTOR_DB_PATH=/app/vector_db
+      - MCP_MONGODB_URI=mongodb://mongodb:27017
+      - MCP_MONGODB_DB_NAME=mcp_server_db
+      - MCP_API_KEY_REQUIRED=false
+      # 可以在此处添加其他环境变量
+    networks:
+      - mcp-network
+
+# 定义数据卷，用于数据持久化
+volumes:
+  mongodb_data:
+  mcp_storage:
+  mcp_vector_db:
+
+# 定义网络
+networks:
+  mcp-network:
+    driver: bridge
