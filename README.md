@@ -50,7 +50,7 @@ mcp_server/
 1. 克隆项目代码：
 
 ```bash
-git clone <项目仓库URL>
+git clone https://github.com/ningwenjie/mcp_server
 cd mcp_server
 ```
 
